@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #include "cuckoo.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -42,14 +40,16 @@ struct cuckoo* newCuckoo(int m){
 int search(int key, struct cuckoo* cHash){
     // Caso esteja na table1
     int pos = hash1(key, SIZE);
-    if(cHash->table1[pos] != NULL && *cHash->table1[pos] == key)
-        return pos;
-
-    // Caso esteja na table2
-    pos = hash2(key, SIZE);
-    if(cHash->table2[pos] != NULL && *cHash->table2[pos] == key)
-        return pos;
-
+    if(cHash->table1[pos] != NULL){
+        if(*cHash->table1[pos] == key)
+            return pos;
+        else if (*cHash->table1[pos] == DELETED){ // Caso esteja deletado procura na table2
+            // Caso esteja na table2
+            pos = hash2(key, SIZE);
+            if(cHash->table2[pos] != NULL && *cHash->table2[pos] == key)
+                return pos;
+        }
+    }
     // Caso não esteja em nenhuma table
     return -1;
 }
@@ -75,16 +75,14 @@ void delete(int key, struct cuckoo* cHash){
     // Se estiver na table1 a deleta
     int pos = hash1(key, SIZE);
     if(cHash->table1[pos] != NULL && *cHash->table1[pos] == key){ 
-        free(cHash->table1[pos]);
-        cHash->table1[pos] = NULL;
+        *cHash->table1[pos] = DELETED;
         return;
     }
 
     // Se estiver na table2 a deleta
     pos = hash2(key, SIZE);
     if(cHash->table2[pos] != NULL && *cHash->table2[pos] == key){ 
-        free(cHash->table2[pos]);
-        cHash->table2[pos] = NULL;
+        *cHash->table2[pos] = DELETED;
         return;
     }
 }
@@ -116,7 +114,7 @@ void navigate(struct cuckoo* cHash){
     int j = 0;
     for(int i = 0; i < SIZE; i++){
         // Se há um elemento nessa posição, o encaixa em uma string e guarda em words
-        if(cHash->table1[i] != NULL){
+        if(cHash->table1[i] != NULL && *cHash->table1[i] != DELETED){
             char* aux = malloc(sizeof(char) * max_size);
             mustAlloc(aux, "aux");
             snprintf(aux, max_size, "%i,T1,%i", *cHash->table1[i], i);
@@ -124,7 +122,7 @@ void navigate(struct cuckoo* cHash){
         }
         
         // Se há um elemento nessa posição, o encaixa em uma string e guarda em words
-        if(cHash->table2[i] != NULL){
+        if(cHash->table2[i] != NULL && *cHash->table2[i] != DELETED){
             char* aux = malloc(sizeof(char) * max_size);
             mustAlloc(aux, "aux");
             snprintf(aux, max_size, "%i,T2,%i", *cHash->table2[i], i);

@@ -1,6 +1,4 @@
-// GRR20195689 Eduardo Vudala Senoski
-
-#define DELETED -2147483648
+#define DELETED 2147483647 // O maior int
 #define SIZE 11
 
 struct cuckoo {

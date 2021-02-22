@@ -1,5 +1,3 @@
-# GRR20195689 Eduardo Vudala Senoski
-
 CC = gcc
 OBJECTS = cuckoo.o main.o
 FLAGS = -Wall -g
