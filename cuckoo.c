@@ -40,21 +40,23 @@ struct cuckoo* newCuckoo(int m){
 int search(int key, struct cuckoo* cHash){
     // Caso esteja na table1
     int pos = hash1(key, SIZE);
-    if(cHash->table1[pos] != NULL){
-        if(*cHash->table1[pos] == key)
-            return pos;
-        else if (*cHash->table1[pos] == DELETED){ // Caso esteja deletado procura na table2
-            // Caso esteja na table2
-            pos = hash2(key, SIZE);
-            if(cHash->table2[pos] != NULL && *cHash->table2[pos] == key)
-                return pos;
-        }
-    }
+    if(cHash->table1[pos] != NULL && *cHash->table1[pos] != DELETED && *cHash->table1[pos] == key)
+        return pos;
+
+    // Caso esteja na table2
+    pos = hash2(key, SIZE);
+    if(cHash->table2[pos] != NULL && *cHash->table2[pos] != DELETED && *cHash->table2[pos] == key)
+        return pos;
+
     // Caso não esteja em nenhuma table
     return -1;
 }
 
 void insert(int key, struct cuckoo* cHash){
+    // Impede a inserção da constante reservada
+    if(key == DELETED)
+        return;
+
     // Caso a chave ja exista em alguma tabela
     if(search(key, cHash) >= 0)
         return;
@@ -72,17 +74,17 @@ void insert(int key, struct cuckoo* cHash){
 }
 
 void delete(int key, struct cuckoo* cHash){
-    // Se estiver na table1 a deleta
-    int pos = hash1(key, SIZE);
-    if(cHash->table1[pos] != NULL && *cHash->table1[pos] == key){ 
-        *cHash->table1[pos] = DELETED;
+    // Se estiver na table2 a deleta
+    int pos = hash2(key, SIZE);
+    if(cHash->table2[pos] != NULL && *cHash->table2[pos] == key){ 
+        *cHash->table2[pos] = DELETED;
         return;
     }
 
-    // Se estiver na table2 a deleta
-    pos = hash2(key, SIZE);
-    if(cHash->table2[pos] != NULL && *cHash->table2[pos] == key){ 
-        *cHash->table2[pos] = DELETED;
+    // Se estiver na table1 a deleta
+    pos = hash1(key, SIZE);
+    if(cHash->table1[pos] != NULL && *cHash->table1[pos] == key){ 
+        *cHash->table1[pos] = DELETED;
         return;
     }
 }

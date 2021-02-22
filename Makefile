@@ -1,6 +1,9 @@
+# Compiler options
 CC = gcc
-OBJECTS = cuckoo.o main.o
 FLAGS = -Wall -g
+
+# I/O
+OBJECTS = cuckoo.o main.o
 OUTPUT = myht
 
 all: $(OBJECTS)

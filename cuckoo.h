@@ -1,5 +1,5 @@
-#define DELETED 2147483647 // O maior int
-#define SIZE 11
+#define DELETED -2147483648 // O maior int
+#define SIZE 11 
 
 struct cuckoo {
     int** table1;
